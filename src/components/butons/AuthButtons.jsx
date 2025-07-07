@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 export default function AuthButtons() {
 
   const [isLogin, setIsLogin] = useState(true);

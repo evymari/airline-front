@@ -13,6 +13,7 @@ import AccountStart from '../components/editPage/AccountStart';
 
 
 
+
  
 
 const router = createBrowserRouter([
@@ -68,7 +69,9 @@ const router = createBrowserRouter([
            {
             path: 'ViewPost/',
             element:<ViewPost/>
-           }
+           },
+
+           
             
            
         ],

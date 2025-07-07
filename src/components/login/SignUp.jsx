@@ -1,148 +1,136 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
 import Button from '../butons/Button';
-import AuthButtons from '../butons/AuthButtons';
-import { USER_REGISTER } from '../../config/Urls';  // Importación de la URL de registro
 
 function SignUp() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [firstName, setFirstName] = useState('');  // Nuevo campo
-  const [lastName, setLastName] = useState('');    // Nuevo campo
+  const [form, setForm] = useState({
+    username: '',
+    password: '',
+    email: '',
+    photoUrl: '',
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleSignUp = async (e) => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    if (!firstName || !lastName || !username || !email || !password) {
-      setError('Please fill out all fields.');
+
+    const { username, password, email, photoUrl } = form;
+
+    if (!username || !password || !email) {
+      setError('Todos los campos son obligatorios');
       return;
     }
-  
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address.');
+      setError('El correo no es válido');
       return;
     }
-  
+
     try {
-      const response = await fetch(USER_REGISTER, {
+      const response = await fetch('http://localhost:8080/api/v1/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ first_name: firstName, last_name: lastName, username, email, password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          email,
+          password: btoa(password),
+          photoUrl,
+        }),
       });
-  
+
       const result = await response.json();
-  
+
       if (response.ok) {
-        setMessage('Account created successfully!');
-        setError('');
-        setUsername('');
-        setEmail('');
-        setPassword('');
-        setFirstName('');
-        setLastName('');
-        navigate('/Login'); 
+        setMessage('¡Cuenta creada exitosamente!');
+        setForm({ username: '', password: '', email: '', photoUrl: '' });
+        navigate('/login');
       } else {
-        setError(result.error || 'An error occurred during registration.');
+        setError(result.error || 'Error durante el registro.');
       }
-    } catch (error) {
-      setError('An unexpected error occurred.');
-      console.error(error);
+    } catch (err) {
+      setError('Error de red o del servidor.');
     }
   };
-  
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 bg-[url('/image/style.png')]">
-      <div className="relative flex flex-col justify-start pb-40 -mt-6">
-        
-        <AuthButtons />
-        <br></br>
-        <div className="relative mb-1">
-          {error && <p className="mb-4 text-center text-red-500">{error}</p>}
-          {message && <p className="mb-4 text-center text-green-500">{message}</p>}
-          <form onSubmit={handleSignUp}>
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full px-4 py-2 border rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full px-4 py-2 border rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-2 border rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                required
-              />
-            </div>
-            <div className="relative mb-8">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-              </button>
-            </div>
-            <Button
-              type="submit"
-              className="font-semibold text-white transition-colors rounded-full bg-purple-600 hover:bg-purple-700"
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white shadow-lg rounded-2xl">
+        <h2 className="text-3xl font-bold text-center text-purple-700">Crear Cuenta</h2>
+
+        {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+        {message && <div className="text-green-600 text-sm text-center">{message}</div>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block mb-1 text-sm font-semibold text-gray-700">Nombre de Usuario</label>
+            <input
+              name="username"
+              placeholder="Ej: evelyn_dev"
+              value={form.username}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-semibold text-gray-700">Correo Electrónico</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="tucorreo@email.com"
+              value={form.email}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-semibold text-gray-700">URL de Foto (opcional)</label>
+            <input
+              name="photoUrl"
+              placeholder="https://..."
+              value={form.photoUrl}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+            />
+          </div>
+
+          <div className="relative">
+            <label className="block mb-1 text-sm font-semibold text-gray-700">Contraseña</label>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Mínimo 6 caracteres"
+              value={form.password}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-[35px] text-sm text-purple-600 hover:underline"
             >
-              Sign up
-            </Button>
-            <div className="w-[334px] mb-4 text-center mt-6 text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link to="/AccountStart" className="text-blue-600 hover:underline">
-                Log in
-              </Link>
-            </div>
-          </form>
+              {showPassword ? 'Ocultar' : 'Ver'}
+            </button>
+          </div>
+
+          <Button type="submit" text="Registrarse" />
+        </form>
+
+        <div className="text-sm text-center text-gray-600">
+          ¿Ya tienes una cuenta?{' '}
+          <a href="/login" className="text-purple-600 hover:underline">
+            Inicia sesión
+          </a>
         </div>
       </div>
     </div>
@@ -150,4 +138,3 @@ function SignUp() {
 }
 
 export default SignUp;
-
