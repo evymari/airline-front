@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
 import Button from '../butons/Button';
-import axiosInstance from '../../config/Axios';
 import AuthToggleButtons from '../butons/AuthToggleButtons';
+import { loginUser } from '../../services/authService';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -21,25 +20,19 @@ function Login() {
     setError('');
     setMessage('');
 
-    try {
-      const response = await axiosInstance.post('/auth/login', {
-        email,
-        password,
-      });
+    const result = await loginUser(email, password);
 
-      const { username, roles } = response.data;
-
-      localStorage.setItem('user', username);
-      localStorage.setItem('roles', roles);
-
+    if (result.success) {
       setMessage('User logged in successfully');
-      navigate('/ViewPost');
-    } catch (error) {
-      if (error.response) {
-        setError(error.response.data.error || 'Login failed');
+
+      // Redirección por rol
+      if (result.roles.includes('ADMIN')) {
+        navigate('/admin/dashboard');
       } else {
-        setError('Network error');
+        navigate('/ViewPost');
       }
+    } else {
+      setError(result.message);
     }
   };
 
@@ -82,7 +75,7 @@ function Login() {
               </button>
             </div>
             <Button type="submit" className="rounded-full bg-purple-600 hover:bg-purple-700 text-white">
-              Log in
+              Log <input type="button" value="" />
             </Button>
             <div className="text-center mt-6 text-sm text-gray-600">
               Don&apos;t have an account yet?{" "}
