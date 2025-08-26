@@ -26,10 +26,10 @@ function Login() {
       setMessage('User logged in successfully');
 
       // Redirección por rol
-      if (result.roles.includes('ADMIN')) {
+      if (result.role === 'ADMIN') {
         navigate('/admin/dashboard');
       } else {
-        navigate('/ViewPost');
+        navigate('/AccountStart');
       }
     } else {
       setError(result.message);
@@ -74,9 +74,15 @@ function Login() {
                 <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
               </button>
             </div>
-            <Button type="submit" className="rounded-full bg-purple-600 hover:bg-purple-700 text-white">
-              Log <input type="button" value="" />
-            </Button>
+
+            <div className="rounded-full bg-purple-600 hover:bg-purple-700 text-white flex justify-center items-center">
+              <Button type="submit">
+                Log
+              </Button>
+            </div>
+
+
+
             <div className="text-center mt-6 text-sm text-gray-600">
               Don&apos;t have an account yet?{" "}
               <Link to="/SignUp" className="text-blue-600 hover:underline">

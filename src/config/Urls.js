@@ -1,14 +1,12 @@
+/*// 🔐 Auth
+export const USER_LOGIN = "/auth/login";      // POST → login
+export const USER_PROFILE = "/auth/profile";  // GET → perfil usuario autenticado
 
-/*
-export const USER_REGISTER = `${BASE_URL}register/`;
-export const USER_DETAIL = `${BASE_URL}profile/`;
-export const USER_LOGIN = `${BASE_URL}login/`;
-export const UPDATE_USER = `${BASE_URL}profile/update/`; 
-export const DELETE_USER = `${BASE_URL}profile/delete/`; 
-export const CHILDREN_API = `${BASE_URL}children/`;
-export const EVENTS_API = `${BASE_URL}events/`;
-export const REGISTRATIONS_API = `${BASE_URL}registrations/`;
-export const USER_API = '/api/user/';
+// 👤 Perfil
+export const UPDATE_USER = (id) => `/profiles/${id}`;  // PUT
+export const USER_DETAIL = (id) => `/profiles/${id}`;  // GET
+export const DELETE_USER = (id) => `/profiles/${id}`;  // DELETE
 
+// 📝 Registro
+export const USER_REGISTER = "/register";    // POST → registro
 */
-
